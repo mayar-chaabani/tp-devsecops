@@ -1,15 +1,23 @@
 """
 Script to create a test user in the database
 """
+import os
+import sys
+
+from dotenv import load_dotenv
 from sqlmodel import Session, select
 from app.database import engine
 from app.models import User
-from app.utils.security import get_password_hash
+from app.services.auth import get_password_hash
+
+load_dotenv()
 
 def create_test_user():
     """Create a test user with the specified credentials"""
     test_email = "chabbahamin5@gmail.com"
-    test_password = "123456789"
+    test_password = os.environ.get("TEST_USER_PASSWORD")
+    if not test_password:
+        sys.exit("Set the TEST_USER_PASSWORD environment variable first.")
     
     with Session(engine) as session:
         # Check if user already exists
@@ -38,7 +46,6 @@ def create_test_user():
         
         print(f"✅ Successfully created test user!")
         print(f"   Email: {test_email}")
-        print(f"   Password: {test_password}")
         print(f"   ID: {new_user.id}")
 
 if __name__ == "__main__":

@@ -82,7 +82,8 @@ def login(
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    # "bearer" is the OAuth2 token type, not a secret (Bandit false positive)
+    return {"access_token": access_token, "token_type": "bearer"}  # nosec B105
 
 
 @router.get("/me", response_model=UserRead)
@@ -173,7 +174,8 @@ async def refresh_token(
             expires_delta=access_token_expires
         )
         
-        return {"access_token": new_access_token, "token_type": "bearer"}
+        # "bearer" is the OAuth2 token type, not a secret (Bandit false positive)
+        return {"access_token": new_access_token, "token_type": "bearer"}  # nosec B105
     
     except JWTError:
         raise HTTPException(
@@ -200,7 +202,8 @@ async def forgot_password(
     if not user:
         return {
             "message": "If the email exists, a password reset link has been sent",
-            "reset_token": "not_found",
+            # Placeholder returned for unknown emails, not a secret (Bandit false positive)
+            "reset_token": "not_found",  # nosec B105
             "expires_in_minutes": 60
         }
     

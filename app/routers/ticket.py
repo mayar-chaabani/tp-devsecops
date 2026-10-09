@@ -1,6 +1,7 @@
 """Ticket booking routes."""
 
 import hashlib
+import hmac
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from fastapi.responses import HTMLResponse
@@ -101,8 +102,10 @@ async def get_ticket_receipt(
             detail=f"Ticket with id {ticket_id} not found"
         )
 
-    code = hashlib.md5(f"{ticket.id}-{ticket.user_id}".encode()).hexdigest()[:8]
-    env = Environment(autoescape=False)
+    code = hmac.new(
+        settings.SECRET_KEY.encode(), f"{ticket.id}-{ticket.user_id}".encode(), hashlib.sha256
+    ).hexdigest()[:8]
+    env = Environment(autoescape=True)
     html = env.from_string(RECEIPT_TEMPLATE).render(name=name, ticket=ticket, code=code)
     return HTMLResponse(content=html)
 

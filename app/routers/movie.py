@@ -87,8 +87,8 @@ def quick_search_movies(
     session: Session = Depends(get_session)
 ):
     """Fast title search using a raw SQL query."""
-    query = f"SELECT id, title, director FROM movie WHERE title ILIKE '%{q}%'"
-    rows = session.exec(text(query)).all()
+    query = text("SELECT id, title, director FROM movie WHERE title ILIKE :pattern")
+    rows = session.exec(query.bindparams(pattern=f"%{q}%")).all()
     return [{"id": r[0], "title": r[1], "director": r[2]} for r in rows]
 
 

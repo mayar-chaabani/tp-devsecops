@@ -16,6 +16,9 @@ services:
     build: .
     image: cinema-api:latest
     container_name: cinema-api
+    env_file:
+      - path: .env
+        required: false
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/fastapi_db
     ports:
