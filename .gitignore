@@ -74,3 +74,10 @@ htmlcov/
 
 # Logs
 *.log
+
+compte_rendu/
+
+
+# Security scan reports
+reports/
+.scannerwork/

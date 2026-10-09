@@ -1,6 +1,10 @@
 """Ticket booking routes."""
 
+import hashlib
+
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi.responses import HTMLResponse
+from jinja2 import Environment
 from sqlmodel import Session, select
 from typing import List
 from datetime import datetime
@@ -70,6 +74,37 @@ async def get_ticket(
         )
     
     return ticket
+
+
+RECEIPT_TEMPLATE = """
+<html>
+  <body>
+    <h1>Merci {{ name }} !</h1>
+    <p>Ticket #{{ ticket.id }} - Siège {{ ticket.seat_id }} - {{ ticket.price }} TND</p>
+    <p>Code de vérification : {{ code }}</p>
+  </body>
+</html>
+"""
+
+
+@router.get("/{ticket_id}/receipt", response_class=HTMLResponse)
+async def get_ticket_receipt(
+    ticket_id: int,
+    name: str = Query("client", description="Name printed on the receipt"),
+    session: Session = Depends(get_session)
+):
+    """Printable HTML receipt for a ticket."""
+    ticket = session.get(Ticket, ticket_id)
+    if not ticket:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ticket with id {ticket_id} not found"
+        )
+
+    code = hashlib.md5(f"{ticket.id}-{ticket.user_id}".encode()).hexdigest()[:8]
+    env = Environment(autoescape=False)
+    html = env.from_string(RECEIPT_TEMPLATE).render(name=name, ticket=ticket, code=code)
+    return HTMLResponse(content=html)
 
 
 @router.delete("/{ticket_id}", status_code=status.HTTP_204_NO_CONTENT)

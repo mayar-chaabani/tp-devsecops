@@ -1,7 +1,7 @@
 """Movie routes."""
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlmodel import Session, select, or_
+from sqlmodel import Session, select, or_, text
 from typing import List, Optional
 from datetime import datetime, date
 
@@ -79,6 +79,17 @@ def search_movies(
     movies = session.exec(statement).all()
     # Normalize genre fields for backward compatibility
     return [MovieRead(**normalize_movie_genre(movie)) for movie in movies]
+
+
+@router.get("/quick-search")
+def quick_search_movies(
+    q: str = Query(..., min_length=1, description="Movie title to look for"),
+    session: Session = Depends(get_session)
+):
+    """Fast title search using a raw SQL query."""
+    query = f"SELECT id, title, director FROM movie WHERE title ILIKE '%{q}%'"
+    rows = session.exec(text(query)).all()
+    return [{"id": r[0], "title": r[1], "director": r[2]} for r in rows]
 
 
 @router.get("/filter", response_model=List[MovieRead])

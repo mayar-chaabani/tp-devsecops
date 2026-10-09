@@ -1,0 +1,15 @@
+.git
+.env
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.vscode/
+.idea/
+compte_rendu/
+images/
+Logos/
+reports/
+uploads/
+.scannerwork/
