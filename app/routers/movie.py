@@ -86,7 +86,7 @@ def search_movies(
 @router.get("/share", response_class=HTMLResponse)
 def share_movie(title: str = Query(..., description="Movie title to share")):
     """Public page to share a movie with friends."""
-    env = Environment(autoescape=False)
+    env = Environment(autoescape=True)
     return env.from_string("<h1>Come watch {{ title }} with me!</h1>").render(title=title)
 
 
