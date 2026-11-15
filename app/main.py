@@ -1,4 +1,5 @@
 """Main FastAPI application - Cinema Ticketing System."""
+import os
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI
@@ -47,6 +48,7 @@ app.add_middleware(
 )
 
 # Mount static files for uploads
+os.makedirs("uploads", exist_ok=True)  # not in git: a fresh checkout (CI) would crash on import
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.add_middleware(
