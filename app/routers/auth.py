@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from datetime import timedelta, datetime, timezone
-from jose import jwt, JWTError
+import jwt
+from jwt import InvalidTokenError
 
 from app.config import settings
 from app.database import get_session
@@ -130,7 +131,7 @@ async def logout(
         
         return {"message": "Successfully logged out"}
     
-    except JWTError:
+    except InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token"
@@ -177,7 +178,7 @@ async def refresh_token(
         # "bearer" is the OAuth2 token type, not a secret (Bandit false positive)
         return {"access_token": new_access_token, "token_type": "bearer"}  # nosec B105
     
-    except JWTError:
+    except InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate token"

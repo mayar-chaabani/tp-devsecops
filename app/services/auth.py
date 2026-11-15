@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
-from jose import JWTError, jwt
+import jwt
+from jwt import InvalidTokenError
 import bcrypt
 import secrets
 import hashlib
@@ -194,7 +195,7 @@ async def get_current_user(
             )
         
         token_data = TokenData(email=email)
-    except JWTError:
+    except InvalidTokenError:
         raise credentials_exception
     
     statement = select(User).where(User.email == token_data.email)
