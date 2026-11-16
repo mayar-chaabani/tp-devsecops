@@ -1,6 +1,8 @@
 """Movie routes."""
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi.responses import HTMLResponse
+from jinja2 import Environment
 from sqlmodel import Session, select, or_, text
 from typing import List, Optional
 from datetime import datetime, date
@@ -79,6 +81,13 @@ def search_movies(
     movies = session.exec(statement).all()
     # Normalize genre fields for backward compatibility
     return [MovieRead(**normalize_movie_genre(movie)) for movie in movies]
+
+
+@router.get("/share", response_class=HTMLResponse)
+def share_movie(title: str = Query(..., description="Movie title to share")):
+    """Public page to share a movie with friends."""
+    env = Environment(autoescape=True)
+    return env.from_string("<h1>Come watch {{ title }} with me!</h1>").render(title=title)
 
 
 @router.get("/quick-search")
