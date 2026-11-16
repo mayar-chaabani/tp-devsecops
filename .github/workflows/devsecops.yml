@@ -114,7 +114,10 @@ jobs:
       - name: ZAP API scan
         run: |
           mkdir -p reports && chmod a+w reports
-          docker run --rm --network host -v "$PWD/reports:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable \
+          # Our copy of ZAP's API-Minimal policy + rule 40012 (Reflected XSS), which the stock policy leaves out.
+          docker run --rm --network host -v "$PWD/reports:/zap/wrk:rw" \
+            -v "$PWD/security/zap/API-Minimal.policy:/home/zap/.ZAP/policies/API-Minimal.policy:ro" \
+            ghcr.io/zaproxy/zaproxy:stable \
             zap-api-scan.py -t http://localhost:8000/openapi.json -f openapi \
             -r zap.html -J zap.json -I
 
