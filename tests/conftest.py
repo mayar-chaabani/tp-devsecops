@@ -1,5 +1,11 @@
 """Test configuration and fixtures."""
 
+import os
+
+# Test-only values, set before the app reads its settings
+os.environ.setdefault("SECRET_KEY", "test-only-secret-key")
+os.environ.setdefault("DATABASE_URL", "sqlite://")
+
 import pytest
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
