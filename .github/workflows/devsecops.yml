@@ -105,8 +105,11 @@ jobs:
       - uses: actions/checkout@v4
 
       # Ephemeral environment: lives only inside this job's runner, destroyed at the end.
+      # Random secrets for this run only: none are stored in the repository.
       - name: Deploy ephemeral environment
-        run: docker compose up -d --build
+        run: |
+          printf 'POSTGRES_PASSWORD=%s\nSECRET_KEY=%s\n' "$(openssl rand -hex 16)" "$(openssl rand -hex 32)" > .env
+          docker compose up -d --build
 
       - name: Wait for the API
         run: timeout 120 sh -c 'until curl -sf http://localhost:8000/openapi.json > /dev/null; do sleep 2; done'
