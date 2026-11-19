@@ -18,7 +18,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # 2. Remove the packaging tools: nothing is installed at runtime, and an
 #    attacker can't use pip to pull in tools.
 # 3. Create an unprivileged user with no login shell.
-RUN apt-get update && apt-get upgrade -y --no-install-recommends     && rm -rf /var/lib/apt/lists/*     && pip uninstall -y pip setuptools wheel \
+RUN apt-get update && apt-get upgrade -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip uninstall -y pip setuptools wheel \
     && useradd --uid 10001 --no-create-home --shell /usr/sbin/nologin appuser
 
 WORKDIR /app
